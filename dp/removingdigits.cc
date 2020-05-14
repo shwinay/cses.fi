@@ -4,47 +4,40 @@ using namespace std;
 
 #define ll long long
 
-ll getMinSteps(ll n, ll count, vector<bool> &isReady, vector<ll> &solutions) {
-    if (n < 10) return count + 1;
-    ll minWays = INT_MAX;
-    ll num = n;
-    while (num > 0) {
-        ll digit = num % 10;
-        if (digit != 0) {
-            if (isReady[n - digit]) {
-                minWays = min(minWays, solutions[n - digit]);
-            }
-            else {
-                auto answer = getMinSteps(n - digit, count + 1, isReady, solutions);
-                isReady[n - digit] = true;
-                solutions[n - digit] = answer;
-                minWays = min(minWays, answer);
-            }
+vector<ll> getDigits(ll n);
+
+ll getMinSteps(ll n, vector<ll> &solutions) {
+    if (n == 0) return 0;
+    if (n < 10) return 1;
+    auto digits = getDigits(n);
+
+    ll minSteps = INT_MAX;
+    for (auto digit : digits) {
+        if (solutions[n - digit] != -1) minSteps = min(minSteps, 1 + solutions[n - digit]);
+        else {
+            auto answer = getMinSteps(n - digit, solutions);
+            solutions[n - digit] = answer;
+            minSteps = min(minSteps, 1 + answer);
         }
-        num /= 10;
     }
-    isReady[n] = true;
-    solutions[n] = minWays;
-    return minWays;
+
+    solutions[n] = minSteps;
+    return minSteps;
 }
 
-ll getMinStepsLong(ll n, ll count) {
-    if (n < 10) return count + 1;
-    ll minWays = INT_MAX;
-    ll num = n;
-    while (num > 0) {
-        ll digit = num % 10;
-        if (digit != 0) minWays = min(minWays, getMinStepsLong(n - digit, count + 1));
-        num /= 10;
+vector<ll> getDigits(ll n) {
+    vector<ll> digits;
+    while (n > 0) {
+        int digit = n % 10;
+        if (digit != 0) digits.push_back(digit);
+        n /= 10;
     }
-    return minWays;
+    return digits;
 }
 
 int main() {
     ll n;
     cin >> n;
-    vector<bool> isReady(n + 1, false);
-    vector<ll> solutions(n + 1, 0);
-    cout << getMinSteps(n, 0, isReady, solutions) << endl;
-    cout << getMinStepsLong(n, 0) << endl;
+    vector<ll> solutions(n + 1, -1);
+    cout << getMinSteps(n, solutions) << endl;
 }

@@ -4,13 +4,25 @@ using namespace std;
 
 #define ll long long
 
+ll dfs(vector<pair<ll, ll>> adjList[], ll node, ll nodeCount) {
+    vector<bool> visited(nodeCount, false);
+    stack<pair<ll, ll>> dfsStack; //takes node, length of currPath
+    ll minVal = LONG_LONG_MAX;
+    dfsStack.push({node, 0});
+    while (!dfsStack.empty()) {
+        pair<ll, ll> currNode = dfsStack.top();
+        dfsStack.pop();
+        if (visited[currNode.first]) continue;
+        for (auto neighbor : adjList[currNode.first]) {
+
+        }
+    }
+}
+
 int main() {
     ll nodes; ll edges;
     cin >> nodes >> edges;
     vector<pair<ll, ll>> adjList[nodes]; //maps from node to pair: {to node, cost to go from -> to}
-    vector<ll> processed(nodes, false);
-    vector<ll> paths(nodes, LONG_LONG_MAX);
-    paths[0] = 0;
     for (ll i = 0; i < edges; i ++) {
         ll from; ll to; ll cost;
         cin >> from >> to >> cost;

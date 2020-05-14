@@ -13,18 +13,25 @@ string jobStr(tuple<ll, ll, ll> &job) {
     return "(" + to_string(get<0>(job)) + ", " + to_string(get<1>(job)) + ", " + to_string(get<2>(job)) + ")";
 }
 
-ll getMaxProfit(vector<tuple<ll, ll, ll>> &jobs, ll index, ll currTime, ll currProfit) {
+ll getMaxProfit(vector<tuple<ll, ll, ll>> &jobs, ll index, ll currTime, ll currProfit, vector<bool> &isReady, vector<ll> &answers) {
     
     if (index >= jobs.size()) return currProfit;
-
     auto currJob = jobs[index];
-
     bool canPick = get<0>(currJob) > currTime;
     if (canPick) {
-        return max(getMaxProfit(jobs, index + 1, currTime, currProfit), getMaxProfit(jobs, index + 1, get<1>(currJob), currProfit + get<2>(currJob)));
+        if (isReady[index]) {
+            return answers[index];
+        }
+        else {
+            ll answer = max(getMaxProfit(jobs, index + 1, currTime, currProfit, isReady, answers), 
+                            getMaxProfit(jobs, index + 1, get<1>(currJob), currProfit + get<2>(currJob), isReady, answers));
+            isReady[index] = true;
+            answers[index] = answer;
+            return answer;
+        }
     }
     else {
-        return getMaxProfit(jobs, index + 1, currTime, currProfit);
+        return getMaxProfit(jobs, index + 1, currTime, currProfit, isReady, answers);
     }
 }
 
@@ -41,5 +48,7 @@ int main() {
     sort(jobs.begin(), jobs.end(), [](auto &left, auto &right) {
         return get<1>(left) < get<1>(right);
     });
-    cout << getMaxProfit(jobs, 0, 0, 0) << endl;
+    vector<ll> answers(jobs.size(), 0);
+    vector<bool> isReady(jobs.size(), false);
+    cout << getMaxProfit(jobs, 0, 0, 0, isReady, answers) << endl;
 }
