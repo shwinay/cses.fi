@@ -4,36 +4,28 @@ using namespace std;
 
 #define ll long long
 
-void printList(vector<ll> list) {
-    cout << "{ ";
-    for (auto elem : list) cout << elem << " ";
-    cout << " }";
-}
-
-int dfs(vector<ll> adjList[], ll node) {
-    ll count = 1;
-    vector<ll> children = adjList[node];
-    for (auto child : children) {
-        count += dfs(adjList, child);
+ll getSuboordinates(vector<vector<ll> > &adjList, int i, vector<ll> &subList) {
+    if (subList[i] != -1) return subList[i];
+    int suboordinates = 0;
+    for (auto neighbor : adjList[i]) {
+        suboordinates += 1 + getSuboordinates(adjList, neighbor, subList);
     }
-    return count;
+
+    subList[i] = suboordinates; 
+    return suboordinates;
 }
 
 int main() {
-    ll nodes;
-    cin >> nodes;
-    vector<ll> adjList[nodes];
+    ll nodes; cin >> nodes;
+    vector<vector<ll> > adjList(nodes, vector<ll>());
     for (ll i = 1; i < nodes; i ++) {
-        ll currNode;
-        cin >> currNode;
-        adjList[currNode - 1].push_back(i);
+        ll boss; cin >> boss; boss --;
+        adjList[boss].push_back(i);
     }
 
-    // for (ll i = 0; i < nodes; i ++) {
-    //     cout << i << ": ";
-    //     printList(adjList[i]);
-    //     cout << endl;
-    // }
-    for (ll i = 0; i < nodes; i ++) cout << dfs(adjList, i) - 1 << " ";
-    cout << endl;
+    vector<ll> suboordinates(nodes, -1);
+    for (int i = 0; i < nodes; i ++) {
+        cout << getSuboordinates(adjList, i, suboordinates) << " ";
+    }
+    cout << "\n";
 }
