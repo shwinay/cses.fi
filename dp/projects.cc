@@ -1,54 +1,33 @@
 #include <bits/stdc++.h>
 
 using namespace std;
-
 #define ll long long
 
-void printJobs(vector<tuple<ll, ll, ll>> &jobs) {
-    for (auto job : jobs) {
-        cout << "(" << get<0>(job) << ", " << get<1>(job) << ", " << get<2>(job) << ")" << endl;
-    }
-}
-string jobStr(tuple<ll, ll, ll> &job) {
-    return "(" + to_string(get<0>(job)) + ", " + to_string(get<1>(job)) + ", " + to_string(get<2>(job)) + ")";
-}
-
-ll getMaxProfit(vector<tuple<ll, ll, ll>> &jobs, ll index, ll currTime, ll currProfit, vector<bool> &isReady, vector<ll> &answers) {
-    
-    if (index >= jobs.size()) return currProfit;
-    auto currJob = jobs[index];
-    bool canPick = get<0>(currJob) > currTime;
-    if (canPick) {
-        if (isReady[index]) {
-            return answers[index];
-        }
-        else {
-            ll answer = max(getMaxProfit(jobs, index + 1, currTime, currProfit, isReady, answers), 
-                            getMaxProfit(jobs, index + 1, get<1>(currJob), currProfit + get<2>(currJob), isReady, answers));
-            isReady[index] = true;
-            answers[index] = answer;
-            return answer;
-        }
-    }
-    else {
-        return getMaxProfit(jobs, index + 1, currTime, currProfit, isReady, answers);
-    }
-}
-
 int main() {
-    ll n;
-    vector<tuple<ll, ll, ll>> jobs;
-    cin >> n;
-    for (ll i = 0; i < n; i ++) {
+    ll n; cin >> n;
+    vector<pair<ll, pair<ll, ll>>> jobs;
+    while (n-- > 0) {
         ll start; ll end; ll profit;
         cin >> start >> end >> profit;
-        auto job = make_tuple(start, end, profit);
-        jobs.push_back(job); 
+        jobs.push_back({start, {end, profit}});
     }
-    sort(jobs.begin(), jobs.end(), [](auto &left, auto &right) {
-        return get<1>(left) < get<1>(right);
+
+    sort(jobs.begin(), jobs.end(), [](const pair<ll, pair<ll, ll>> &a, const pair<ll, pair<ll, ll>> &b) {
+        return a.second.first < b.second.first;
     });
-    vector<ll> answers(jobs.size(), 0);
-    vector<bool> isReady(jobs.size(), false);
-    cout << getMaxProfit(jobs, 0, 0, 0, isReady, answers) << endl;
+
+    vector<ll> answers;
+    for (auto i : jobs) answers.push_back(i.second.second);
+
+    for (int i = 0; i < jobs.size(); i ++) {
+        for (int j = 0; j < i; j ++) {
+            if (jobs[i].first > jobs[j].second.first) {
+                answers[i] = max(answers[i], jobs[i].second.second + answers[j]);
+            }
+        }
+    }
+
+    cout << *max_element(answers.begin(), answers.end()) << endl;
+
+
 }

@@ -3,7 +3,7 @@
 using namespace std;
 #define ll long long
 
-ll findMatchings(vector<vector<ll>> &adjList, ll currNode, bool canInclude, int parent, vector<pair<ll, ll>> &dp) {
+ll findMatchings(vector<vector<ll>> &adjList, ll currNode, bool canInclude, ll parent, vector<pair<ll, ll>> &dp) {
     ll keepNodeMatches = 0;
     ll discardNodeMatches = 0;
 
@@ -36,6 +36,8 @@ ll findMatchings(vector<vector<ll>> &adjList, ll currNode, bool canInclude, int 
 }
 
 int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
     ll n; cin >> n;
     vector<vector<ll>> adjList(n, vector<ll>());
     for (ll i = 0; i < n - 1; i ++) {
@@ -48,7 +50,7 @@ int main() {
     
     //pair.first = (canInclude == true), pair.second = (canInclude == false)
     vector<pair<ll, ll>> dp(n, {-1, -1});
-    cout << "started.." << endl;
+    // cout << "started.." << endl;
     cout << findMatchings(adjList, 0, true, -1, dp) << endl;
 }
 

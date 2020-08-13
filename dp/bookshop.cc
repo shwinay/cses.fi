@@ -1,55 +1,45 @@
 #include <bits/stdc++.h>
 
 using namespace std;
-
 #define ll long long
 
-int getMaxPages(vector<int> &prices, vector<int> &pages, int index, int currPrice, vector<vector<int>> &answers) {
-    if (currPrice <= 0 || index >= prices.size()) return 0;
-    
-    //select the item
-    int selectedPages = 0;
-    if (currPrice - prices[index] >= 0) {
-        if (index + 1 < pages.size() && answers[currPrice - prices[index]][index + 1] != -1) {
-            //cout << "triggered!" << endl;
-            selectedPages = pages[index] + answers[currPrice - prices[index]][index + 1];
-        } else {
-            selectedPages = pages[index] + getMaxPages(prices, pages, index + 1, currPrice - prices[index], answers);
-            if (index + 1 < pages.size()) answers[currPrice - prices[index]][index + 1] = selectedPages - pages[index];
-        }
-    }
 
-    //don't select the item
-    int unselectedPages = 0;
-    if (index + 1 < pages.size() && answers[currPrice][index + 1] != -1) {
-        //cout << "t!" << endl;
-        unselectedPages = answers[currPrice][index + 1];
-    }
-    else {
-        unselectedPages = getMaxPages(prices, pages, index + 1, currPrice, answers);
-        if (index + 1 < pages.size()) answers[currPrice][index + 1] = unselectedPages;
-    }
+ll solve(vector<pair<ll, ll>> &books, ll index, ll remainingAmount, vector<vector<ll>> &dp) {
+    if (remainingAmount <= 0 || index >= books.size()) return 0;
 
-    answers[currPrice][index] = max(selectedPages, unselectedPages);
-    return max(selectedPages, unselectedPages);
+    if (dp[index][remainingAmount] != -1) return dp[index][remainingAmount];
+    //choose book, or don't choose book
+    ll profit1 = 0;
+    if (remainingAmount - books[index].first >= 0) profit1 = books[index].second + solve(books, index + 1, remainingAmount - books[index].first, dp); 
+    ll profit2 = solve(books, index + 1, remainingAmount, dp);
 
+    dp[index][remainingAmount] = max(profit1, profit2);
+    return max(profit1, profit2);
 }
+
 
 int main() {
-    int numBooks; int maxPrice;
-    cin >> numBooks >> maxPrice;
-    vector<int> prices; vector<int> pages;
-    for (int i = 0; i < numBooks; i ++) {
-        int price; cin >> price;
-        prices.push_back(price);
+    ll n; ll p;
+    cin >> n >> p;
+    vector<ll> prices;
+    vector<ll> pages;
+    for (int i = 0; i < n; i ++) {
+        ll x; cin >> x;
+        prices.push_back(x);
     }
-    for (int i = 0; i < numBooks; i ++) {
-        int page; cin >> page;
-        pages.push_back(page);
+    for (int i = 0; i < n; i ++) {
+        ll x; cin >> x;
+        pages.push_back(x);
     }
+    vector<pair<ll, ll>> books;
+    for (int i = 0; i < n; i ++) {
+        books.push_back({prices[i], pages[i]});
+    }
+    sort(books.begin(), books.end());
+    cout << "started.." << endl;
 
-    //numItems by maxPrice
-    //each price has an answer for a given index
-    vector<vector<int>> answers(maxPrice + 1, vector<int>(pages.size(), -1));
-    cout << getMaxPages(prices, pages, 0, maxPrice, answers) << endl;
+    vector<vector<ll>> dp(books.size() + 1, vector<ll>(p + 1, -1));
+    cout << solve(books, 0, p, dp) << endl;
 }
+
+//dp on index, amount left
